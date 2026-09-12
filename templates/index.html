@@ -12,15 +12,15 @@
         /* 1. DARK TECH BACKGROUND */
         body { 
             background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-            color: #f8fafc; /* Puting text para readable sa dark bg */
+            color: #f8fafc;
             font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             min-height: 100vh;
         }
         
         /* 2. MODERN CARD DESIGN */
         .card { 
-            background-color: rgba(30, 41, 59, 0.8); /* Semi-transparent dark slate */
-            backdrop-filter: blur(10px); /* Glassmorphism effect */
+            background-color: rgba(30, 41, 59, 0.8);
+            backdrop-filter: blur(10px);
             border-radius: 15px; 
             border: 1px solid rgba(255, 255, 255, 0.1);
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
@@ -49,12 +49,26 @@
             text-shadow: 0 0 10px rgba(56, 189, 248, 0.5);
             color: #38bdf8 !important;
         }
+
+        /* Status Dot Indicator */
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 5px;
+        }
+        .dot-live { background-color: #22c55e; box-shadow: 0 0 8px #22c55e; }
+        .dot-error { background-color: #ef4444; box-shadow: 0 0 8px #ef4444; }
     </style>
 </head>
 <body>
     <div class="container mt-5">
         <h2 class="text-center mb-2 fw-bold glow-text">🌡️ Gas & Vibration Monitoring</h2>
-        <p class="text-center text-secondary mb-5">IoT Real-time Dashboard (Simulated Data)</p>
+        <p class="text-center text-secondary mb-5">
+            <span class="status-dot dot-live" id="status-dot"></span>
+            <span id="status-text">IoT Real-time Dashboard</span>
+        </p>
         
         <!-- Status Cards -->
         <div class="row text-center mb-4">
@@ -100,16 +114,16 @@
     </div>
 
     <script>
-        // 1. SETUP CHART.JS (Inadjust ang kulay para sa dark mode)
+        // 1. SETUP CHART.JS (Dark Mode Style)
         const ctx = document.getElementById('gasChart').getContext('2d');
         const gasChart = new Chart(ctx, {
             type: 'line',
             data: {
-                labels: [], // Oras
+                labels: [],
                 datasets: [{
                     label: 'Gas Level (PPM)',
-                    data: [], // Gas values
-                    borderColor: '#38bdf8', // Sky blue para sa dark mode
+                    data: [],
+                    borderColor: '#38bdf8',
                     backgroundColor: 'rgba(56, 189, 248, 0.1)',
                     borderWidth: 3,
                     fill: true,
@@ -123,15 +137,13 @@
             options: {
                 responsive: true,
                 plugins: {
-                    legend: { 
-                        labels: { color: '#94a3b8' } // Kulay ng text sa legend
-                    }
+                    legend: { labels: { color: '#94a3b8' } }
                 },
                 scales: {
                     y: { 
                         beginAtZero: true, 
                         max: 1023,
-                        grid: { color: 'rgba(255, 255, 255, 0.05)' }, // Manipis na grid lines
+                        grid: { color: 'rgba(255, 255, 255, 0.05)' },
                         ticks: { color: '#94a3b8' }
                     },
                     x: { 
@@ -139,68 +151,73 @@
                         ticks: { color: '#94a3b8' }
                     }
                 },
-                animation: { duration: 0 } // Iniiwasan ang lag sa real-time updates
+                animation: { duration: 0 }
             }
         });
 
-        // 2. SIMULATED DATA LOGIC 
-        function generateFakeData() {
-            const gasValue = Math.floor(Math.random() * (800 - 200 + 1)) + 200; 
-            const vibrationValue = Math.random() > 0.8 ? 1 : 0; 
-            return { gasValue, vibrationValue };
+        // 2. UPDATE DASHBOARD FUNCTION (Kukuha na mula sa Flask API / Supabase)
+        async function updateDashboard() {
+            try {
+                const response = await fetch('/api/data');
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+
+                // Update Connection Status Indicator
+                const statusDot = document.getElementById('status-dot');
+                const statusText = document.getElementById('status-text');
+                statusDot.className = 'status-dot dot-live';
+                statusText.innerText = 'Connected to Supabase - IoT Real-time Dashboard';
+
+                // Update Numbers (Gas)
+                document.getElementById('gas-value').innerText = data.gas_value;
+                
+                // Update Vibration Status
+                const vibText = data.vibration === 1 ? '⚠️ DETECTED' : '✅ SAFE';
+                const vibElement = document.getElementById('vibration-value');
+                vibElement.innerText = vibText;
+                
+                if (data.vibration === 1) {
+                    vibElement.className = 'display-5 text-danger fw-bold';
+                    vibElement.style.textShadow = '0 0 15px rgba(220, 53, 69, 0.5)';
+                } else {
+                    vibElement.className = 'display-5 text-success fw-bold';
+                    vibElement.style.textShadow = '0 0 15px rgba(25, 135, 84, 0.5)';
+                }
+
+                // Check Alert Logic
+                const alertElement = document.getElementById('alert-value');
+                if (data.alert) {
+                    alertElement.innerText = '🚨 ALERT!';
+                    alertElement.className = 'display-5 text-danger fw-bold';
+                    alertElement.style.textShadow = '0 0 15px rgba(220, 53, 69, 0.5)';
+                } else {
+                    alertElement.innerText = '✅ NORMAL';
+                    alertElement.className = 'display-5 text-success fw-bold';
+                    alertElement.style.textShadow = '0 0 15px rgba(25, 135, 84, 0.5)';
+                }
+
+                // Update Chart gamit ang totoong data mula Supabase
+                gasChart.data.labels = data.time_history;
+                gasChart.data.datasets[0].data = data.gas_history;
+                gasChart.update();
+
+            } catch (error) {
+                console.error("Error fetching data:", error);
+                
+                // Ipakita na may connection error
+                const statusDot = document.getElementById('status-dot');
+                const statusText = document.getElementById('status-text');
+                statusDot.className = 'status-dot dot-error';
+                statusText.innerText = 'Connection Error - Retrying...';
+            }
         }
 
-        // 3. UPDATE DASHBOARD FUNCTION
-        function updateDashboard() {
-            const data = generateFakeData();
-            
-            // Update Numbers (Gas)
-            document.getElementById('gas-value').innerText = data.gasValue;
-            
-            // Update Vibration Status
-            const vibText = data.vibrationValue === 1 ? '⚠️ DETECTED' : '✅ SAFE';
-            const vibElement = document.getElementById('vibration-value');
-            vibElement.innerText = vibText;
-            
-            if (data.vibrationValue === 1) {
-                vibElement.className = 'display-5 text-danger fw-bold';
-                vibElement.style.textShadow = '0 0 15px rgba(220, 53, 69, 0.5)';
-            } else {
-                vibElement.className = 'display-5 text-success fw-bold';
-                vibElement.style.textShadow = '0 0 15px rgba(25, 135, 84, 0.5)';
-            }
-
-            // Check Alert Logic
-            const isAlert = data.gasValue > 500 || data.vibrationValue === 1;
-            const alertElement = document.getElementById('alert-value');
-            
-            if (isAlert) {
-                alertElement.innerText = '🚨 ALERT!';
-                alertElement.className = 'display-5 text-danger fw-bold';
-                alertElement.style.textShadow = '0 0 15px rgba(220, 53, 69, 0.5)';
-            } else {
-                alertElement.innerText = '✅ NORMAL';
-                alertElement.className = 'display-5 text-success fw-bold';
-                alertElement.style.textShadow = '0 0 15px rgba(25, 135, 84, 0.5)';
-            }
-
-            // Update Chart
-            const now = new Date();
-            const timeString = now.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute:'2-digit', second:'2-digit' });
-            
-            gasChart.data.labels.push(timeString);
-            gasChart.data.datasets[0].data.push(data.gasValue);
-
-            if (gasChart.data.labels.length > 20) {
-                gasChart.data.labels.shift();
-                gasChart.data.datasets[0].data.shift();
-            }
-
-            gasChart.update();
-        }
-
-        // 4. RUN EVERY 2 SECONDS
-        setInterval(updateDashboard, 2000);
+        // 3. RUN EVERY 3 SECONDS
+        setInterval(updateDashboard, 3000);
         updateDashboard(); // Initial run
     </script>
 </body>
