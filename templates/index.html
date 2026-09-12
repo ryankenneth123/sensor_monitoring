@@ -32,13 +32,19 @@
             box-shadow: 0 8px 25px rgba(0, 0, 0, 0.6);
         }
         
-        /* Flexbox para pantay ang laman ng cards */
-        .card-body { 
+        /* Flexbox para pantay ang laman ng status cards */
+        .status-card-body { 
             display: flex; 
             flex-direction: column; 
             justify-content: center; 
             align-items: center; 
-            min-height: 200px;
+            min-height: 180px; /* Binaba natin para makatipid sa space */
+        }
+
+        /* Flexbox para sa graph cards */
+        .graph-card-body { 
+            padding: 1.5rem; 
+            min-height: 280px;
         }
 
         /* Muted text color para sa mga labels */
@@ -63,9 +69,9 @@
     </style>
 </head>
 <body>
-    <div class="container mt-5">
+    <div class="container mt-4">
         <h2 class="text-center mb-2 fw-bold glow-text">🌡️ Gas & Vibration Monitoring</h2>
-        <p class="text-center text-secondary mb-5">
+        <p class="text-center text-secondary mb-4">
             <span class="status-dot dot-live" id="status-dot"></span>
             <span id="status-text">IoT Real-time Dashboard</span>
         </p>
@@ -75,9 +81,9 @@
             <!-- Gas Card -->
             <div class="col-md-4 mb-3">
                 <div class="card h-100 border-top border-primary border-4">
-                    <div class="card-body">
-                        <h5 class="card-title text-secondary mb-3">Gas Level (MQ-2)</h5>
-                        <h1 class="display-3 text-primary fw-bold" id="gas-value" style="text-shadow: 0 0 15px rgba(13, 110, 253, 0.5);">0</h1>
+                    <div class="status-card-body">
+                        <h5 class="card-title text-secondary mb-2">Gas Level (MQ-2)</h5>
+                        <h1 class="display-4 text-primary fw-bold" id="gas-value" style="text-shadow: 0 0 15px rgba(13, 110, 253, 0.5);">0</h1>
                         <span class="badge bg-dark border border-secondary mt-3 px-3 py-2">Threshold: 500</span>
                     </div>
                 </div>
@@ -85,8 +91,8 @@
             <!-- Vibration Card -->
             <div class="col-md-4 mb-3">
                 <div class="card h-100 border-top border-success border-4">
-                    <div class="card-body">
-                        <h5 class="card-title text-secondary mb-3">Vibration (SW-420)</h5>
+                    <div class="status-card-body">
+                        <h5 class="card-title text-secondary mb-2">Vibration (SW-420)</h5>
                         <h1 class="display-5 text-success fw-bold" id="vibration-value" style="text-shadow: 0 0 15px rgba(25, 135, 84, 0.5);">✅ SAFE</h1>
                         <span class="badge bg-dark border border-secondary mt-3 px-3 py-2">Status</span>
                     </div>
@@ -95,8 +101,8 @@
             <!-- Alert Card -->
             <div class="col-md-4 mb-3">
                 <div class="card h-100 border-top border-danger border-4">
-                    <div class="card-body">
-                        <h5 class="card-title text-secondary mb-3">System Alert</h5>
+                    <div class="status-card-body">
+                        <h5 class="card-title text-secondary mb-2">System Alert</h5>
                         <h1 class="display-5 text-success fw-bold" id="alert-value" style="text-shadow: 0 0 15px rgba(25, 135, 84, 0.5);">✅ NORMAL</h1>
                         <span class="badge bg-dark border border-secondary mt-3 px-3 py-2">Buzzer & LED</span>
                     </div>
@@ -104,23 +110,27 @@
             </div>
         </div>
 
-        <!-- Graphs Section (Naka-stack na ngayon) -->
+        <!-- Graphs Section -->
         <div class="row">
-            <!-- Gas Graph (Full Width) -->
+            <!-- Gas Graph -->
             <div class="col-md-12 mb-4">
-                <div class="card shadow-sm h-100">
-                    <div class="card-body" style="align-items: stretch; min-height: auto; padding: 2rem;">
-                        <h5 class="card-title text-secondary mb-4 text-start">📈 Gas Readings (MQ-2)</h5>
-                        <canvas id="gasChart" style="max-height: 300px;"></canvas>
+                <div class="card shadow-sm">
+                    <div class="graph-card-body">
+                        <h5 class="card-title text-secondary mb-3 text-start">📈 Gas Readings (MQ-2)</h5>
+                        <div style="height: 220px; width: 100%;">
+                            <canvas id="gasChart"></canvas>
+                        </div>
                     </div>
                 </div>
             </div>
-            <!-- Vibration Graph (Full Width, nasa ibaba na) -->
+            <!-- Vibration Graph -->
             <div class="col-md-12 mb-4">
-                <div class="card shadow-sm h-100">
-                    <div class="card-body" style="align-items: stretch; min-height: auto; padding: 2rem;">
-                        <h5 class="card-title text-secondary mb-4 text-start">📉 Vibration Readings (SW-420)</h5>
-                        <canvas id="vibrationChart" style="max-height: 300px;"></canvas>
+                <div class="card shadow-sm">
+                    <div class="graph-card-body">
+                        <h5 class="card-title text-secondary mb-3 text-start">📉 Vibration Readings (SW-420)</h5>
+                        <div style="height: 220px; width: 100%;">
+                            <canvas id="vibrationChart"></canvas>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -152,6 +162,7 @@
             },
             options: {
                 responsive: true,
+                maintainAspectRatio: false, // IMPORTANTE ITO PARA HINDI MAGING SOBRANG TAAS
                 plugins: { legend: { labels: { color: '#94a3b8' } } },
                 scales: {
                     y: { beginAtZero: true, max: 1023, grid: { color: 'rgba(255, 255, 255, 0.05)' }, ticks: { color: '#94a3b8' } },
@@ -172,11 +183,11 @@
                 datasets: [{
                     label: 'Vibration (0 = Safe, 1 = Detected)',
                     data: [],
-                    borderColor: '#ef4444', // Red color para sa vibration
+                    borderColor: '#ef4444',
                     backgroundColor: 'rgba(239, 68, 68, 0.1)',
                     borderWidth: 3,
                     fill: true,
-                    tension: 0, // Straight lines para kitang-kita yung pagtaas at pagbaba
+                    tension: 0,
                     pointRadius: 4,
                     pointBackgroundColor: '#0f172a',
                     pointBorderColor: '#ef4444',
@@ -185,11 +196,12 @@
             },
             options: {
                 responsive: true,
+                maintainAspectRatio: false, // IMPORTANTE ITO PARA HINDI MAGING SOBRANG TAAS
                 plugins: { legend: { labels: { color: '#94a3b8' } } },
                 scales: {
                     y: { 
                         beginAtZero: true, 
-                        max: 1.5, // Maximum 1.5 para hindi umabot sa tuktok yung linya
+                        max: 1.2, // Binaba natin from 1.5 para hindi masyadong mataas ang empty space
                         ticks: { stepSize: 1, color: '#94a3b8' }, 
                         grid: { color: 'rgba(255, 255, 255, 0.05)' } 
                     },
