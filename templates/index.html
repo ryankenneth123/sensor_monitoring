@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sensor Monitoring Dashboard</title>
+    <!-- Bootstrap para sa layout -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Chart.js para sa graph -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* 1. DARK TECH BACKGROUND */
+        body { 
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: #f8fafc; /* Puting text para readable sa dark bg */
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            min-height: 100vh;
+        }
+        
+        /* 2. MODERN CARD DESIGN */
+        .card { 
+            background-color: rgba(30, 41, 59, 0.8); /* Semi-transparent dark slate */
+            backdrop-filter: blur(10px); /* Glassmorphism effect */
+            border-radius: 15px; 
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+            transition: transform 0.3s, box-shadow 0.3s; 
+            color: #f8fafc;
+        }
+        .card:hover { 
+            transform: translateY(-5px); 
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.6);
+        }
+        
+        /* Flexbox para pantay ang laman ng cards */
+        .card-body { 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: center; 
+            align-items: center; 
+            min-height: 200px;
+        }
+
+        /* Muted text color para sa mga labels */
+        .text-secondary { color: #94a3b8 !important; }
+        
+        /* Glowing Title Effect */
+        .glow-text {
+            text-shadow: 0 0 10px rgba(56, 189, 248, 0.5);
+            color: #38bdf8 !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <h2 class="text-center mb-2 fw-bold glow-text">🌡️ Gas & Vibration Monitoring</h2>
+        <p class="text-center text-secondary mb-5">IoT Real-time Dashboard (Simulated Data)</p>
+        
+        <!-- Status Cards -->
+        <div class="row text-center mb-4">
+            <!-- Gas Card -->
+            <div class="col-md-4 mb-3">
+                <div class="card h-100 border-top border-primary border-4">
+                    <div class="card-body">
+                        <h5 class="card-title text-secondary mb-3">Gas Level (MQ-2)</h5>
+                        <h1 class="display-3 text-primary fw-bold" id="gas-value" style="text-shadow: 0 0 15px rgba(13, 110, 253, 0.5);">0</h1>
+                        <span class="badge bg-dark border border-secondary mt-3 px-3 py-2">Threshold: 500</span>
+                    </div>
+                </div>
+            </div>
+            <!-- Vibration Card -->
+            <div class="col-md-4 mb-3">
+                <div class="card h-100 border-top border-success border-4">
+                    <div class="card-body">
+                        <h5 class="card-title text-secondary mb-3">Vibration (SW-420)</h5>
+                        <h1 class="display-5 text-success fw-bold" id="vibration-value" style="text-shadow: 0 0 15px rgba(25, 135, 84, 0.5);">✅ SAFE</h1>
+                        <span class="badge bg-dark border border-secondary mt-3 px-3 py-2">Status</span>
+                    </div>
+                </div>
+            </div>
+            <!-- Alert Card -->
+            <div class="col-md-4 mb-3">
+                <div class="card h-100 border-top border-danger border-4">
+                    <div class="card-body">
+                        <h5 class="card-title text-secondary mb-3">System Alert</h5>
+                        <h1 class="display-5 text-success fw-bold" id="alert-value" style="text-shadow: 0 0 15px rgba(25, 135, 84, 0.5);">✅ NORMAL</h1>
+                        <span class="badge bg-dark border border-secondary mt-3 px-3 py-2">Buzzer & LED</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Graph Section -->
+        <div class="card shadow-sm mb-5">
+            <div class="card-body" style="align-items: stretch; min-height: auto; padding: 2rem;">
+                <h5 class="card-title text-secondary mb-4 text-start">📈 Real-time Gas Readings</h5>
+                <canvas id="gasChart" style="max-height: 400px;"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 1. SETUP CHART.JS (Inadjust ang kulay para sa dark mode)
+        const ctx = document.getElementById('gasChart').getContext('2d');
+        const gasChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: [], // Oras
+                datasets: [{
+                    label: 'Gas Level (PPM)',
+                    data: [], // Gas values
+                    borderColor: '#38bdf8', // Sky blue para sa dark mode
+                    backgroundColor: 'rgba(56, 189, 248, 0.1)',
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.4,
+                    pointRadius: 4,
+                    pointBackgroundColor: '#0f172a',
+                    pointBorderColor: '#38bdf8',
+                    pointBorderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { 
+                        labels: { color: '#94a3b8' } // Kulay ng text sa legend
+                    }
+                },
+                scales: {
+                    y: { 
+                        beginAtZero: true, 
+                        max: 1023,
+                        grid: { color: 'rgba(255, 255, 255, 0.05)' }, // Manipis na grid lines
+                        ticks: { color: '#94a3b8' }
+                    },
+                    x: { 
+                        grid: { display: false },
+                        ticks: { color: '#94a3b8' }
+                    }
+                },
+                animation: { duration: 0 } // Iniiwasan ang lag sa real-time updates
+            }
+        });
+
+        // 2. SIMULATED DATA LOGIC 
+        function generateFakeData() {
+            const gasValue = Math.floor(Math.random() * (800 - 200 + 1)) + 200; 
+            const vibrationValue = Math.random() > 0.8 ? 1 : 0; 
+            return { gasValue, vibrationValue };
+        }
+
+        // 3. UPDATE DASHBOARD FUNCTION
+        function updateDashboard() {
+            const data = generateFakeData();
+            
+            // Update Numbers (Gas)
+            document.getElementById('gas-value').innerText = data.gasValue;
+            
+            // Update Vibration Status
+            const vibText = data.vibrationValue === 1 ? '⚠️ DETECTED' : '✅ SAFE';
+            const vibElement = document.getElementById('vibration-value');
+            vibElement.innerText = vibText;
+            
+            if (data.vibrationValue === 1) {
+                vibElement.className = 'display-5 text-danger fw-bold';
+                vibElement.style.textShadow = '0 0 15px rgba(220, 53, 69, 0.5)';
+            } else {
+                vibElement.className = 'display-5 text-success fw-bold';
+                vibElement.style.textShadow = '0 0 15px rgba(25, 135, 84, 0.5)';
+            }
+
+            // Check Alert Logic
+            const isAlert = data.gasValue > 500 || data.vibrationValue === 1;
+            const alertElement = document.getElementById('alert-value');
+            
+            if (isAlert) {
+                alertElement.innerText = '🚨 ALERT!';
+                alertElement.className = 'display-5 text-danger fw-bold';
+                alertElement.style.textShadow = '0 0 15px rgba(220, 53, 69, 0.5)';
+            } else {
+                alertElement.innerText = '✅ NORMAL';
+                alertElement.className = 'display-5 text-success fw-bold';
+                alertElement.style.textShadow = '0 0 15px rgba(25, 135, 84, 0.5)';
+            }
+
+            // Update Chart
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute:'2-digit', second:'2-digit' });
+            
+            gasChart.data.labels.push(timeString);
+            gasChart.data.datasets[0].data.push(data.gasValue);
+
+            if (gasChart.data.labels.length > 20) {
+                gasChart.data.labels.shift();
+                gasChart.data.datasets[0].data.shift();
+            }
+
+            gasChart.update();
+        }
+
+        // 4. RUN EVERY 2 SECONDS
+        setInterval(updateDashboard, 2000);
+        updateDashboard(); // Initial run
+    </script>
+</body>
+</html>
