@@ -38,7 +38,7 @@
             flex-direction: column; 
             justify-content: center; 
             align-items: center; 
-            min-height: 180px; /* Binaba natin para makatipid sa space */
+            min-height: 180px;
         }
 
         /* Flexbox para sa graph cards */
@@ -162,7 +162,7 @@
             },
             options: {
                 responsive: true,
-                maintainAspectRatio: false, // IMPORTANTE ITO PARA HINDI MAGING SOBRANG TAAS
+                maintainAspectRatio: false,
                 plugins: { legend: { labels: { color: '#94a3b8' } } },
                 scales: {
                     y: { beginAtZero: true, max: 1023, grid: { color: 'rgba(255, 255, 255, 0.05)' }, ticks: { color: '#94a3b8' } },
@@ -173,7 +173,7 @@
         });
 
         // ==========================================
-        // 2. SETUP CHART.JS (VIBRATION)
+        // 2. SETUP CHART.JS (VIBRATION - Ginaya na natin ang Gas style)
         // ==========================================
         const ctxVib = document.getElementById('vibrationChart').getContext('2d');
         const vibrationChart = new Chart(ctxVib, {
@@ -187,7 +187,7 @@
                     backgroundColor: 'rgba(239, 68, 68, 0.1)',
                     borderWidth: 3,
                     fill: true,
-                    tension: 0,
+                    tension: 0.4, // <--- Binago natin from 0 to 0.4 para maging smooth curve
                     pointRadius: 4,
                     pointBackgroundColor: '#0f172a',
                     pointBorderColor: '#ef4444',
@@ -196,12 +196,12 @@
             },
             options: {
                 responsive: true,
-                maintainAspectRatio: false, // IMPORTANTE ITO PARA HINDI MAGING SOBRANG TAAS
+                maintainAspectRatio: false,
                 plugins: { legend: { labels: { color: '#94a3b8' } } },
                 scales: {
                     y: { 
                         beginAtZero: true, 
-                        max: 1.2, // Binaba natin from 1.5 para hindi masyadong mataas ang empty space
+                        max: 1.2, // <--- Binaba natin from 1.5 para hindi masyadong malaki yung space sa taas
                         ticks: { stepSize: 1, color: '#94a3b8' }, 
                         grid: { color: 'rgba(255, 255, 255, 0.05)' } 
                     },
