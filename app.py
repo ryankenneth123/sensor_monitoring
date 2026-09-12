@@ -30,11 +30,13 @@ def get_sensor_data():
                 'vibration': 0, 
                 'alert': False, 
                 'gas_history': [0]*20, 
+                'vibration_history': [0]*20, # <--- ITO YUNG KULANG KANINA
                 'time_history': ['--:--']*20
             })
 
         # I-extract ang data para sa graph
         gas_history = [row['gas_value'] for row in data]
+        vibration_history = [row['vibration_value'] for row in data] # <--- IDINAGDAG NATIN ITO
         
         # Kunin lang yung oras (HH:MM:SS) mula sa timestamp
         time_history = []
@@ -57,6 +59,7 @@ def get_sensor_data():
             'vibration': vibration,
             'alert': alert,
             'gas_history': gas_history,
+            'vibration_history': vibration_history, # <--- IDINAGDAG NATIN ITO
             'time_history': time_history
         })
 
