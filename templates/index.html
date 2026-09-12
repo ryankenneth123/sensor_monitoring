@@ -173,7 +173,7 @@
         });
 
         // ==========================================
-        // 2. SETUP CHART.JS (VIBRATION - DIGITAL STEPPED)
+        // 2. SETUP CHART.JS (VIBRATION - Ginaya na sa Gas style, 0-5 scale)
         // ==========================================
         const ctxVib = document.getElementById('vibrationChart').getContext('2d');
         const vibrationChart = new Chart(ctxVib, {
@@ -187,7 +187,7 @@
                     backgroundColor: 'rgba(239, 68, 68, 0.1)',
                     borderWidth: 3,
                     fill: true,
-                    stepped: true, // Stepped line para maging hagdan
+                    tension: 0.4, // Smooth curve, katulad ng Gas graph
                     pointRadius: 4,
                     pointBackgroundColor: '#0f172a',
                     pointBorderColor: '#ef4444',
@@ -201,7 +201,7 @@
                 scales: {
                     y: { 
                         min: 0,   // Simula sa 0
-                        max: 1.5, // <--- BINABA NATIN ITO. Dati 1.2, ngayon 1.5. Para yung "1" ay nasa gitna lang.
+                        max: 5,   // <--- BINAGO NATIN ITO (0 to 5 base sa request mo)
                         ticks: { stepSize: 1, color: '#94a3b8' }, 
                         grid: { color: 'rgba(255, 255, 255, 0.05)' } 
                     },
