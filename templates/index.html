@@ -187,7 +187,7 @@
                     backgroundColor: 'rgba(239, 68, 68, 0.1)',
                     borderWidth: 3,
                     fill: true,
-                    stepped: true, // <--- ITO YUNG MAGIC! Ginagawa niyang hagdan (square wave) imbes na straight line
+                    stepped: true, // Stepped line para maging hagdan
                     pointRadius: 4,
                     pointBackgroundColor: '#0f172a',
                     pointBorderColor: '#ef4444',
@@ -200,8 +200,8 @@
                 plugins: { legend: { labels: { color: '#94a3b8' } } },
                 scales: {
                     y: { 
-                        min: -0.2, // <--- Binigyan natin ng konting space sa baba
-                        max: 1.2,  // <--- Binigyan natin ng konting space sa taas
+                        min: 0,   // Simula sa 0
+                        max: 1.5, // <--- BINABA NATIN ITO. Dati 1.2, ngayon 1.5. Para yung "1" ay nasa gitna lang.
                         ticks: { stepSize: 1, color: '#94a3b8' }, 
                         grid: { color: 'rgba(255, 255, 255, 0.05)' } 
                     },
