@@ -173,7 +173,7 @@
         });
 
         // ==========================================
-        // 2. SETUP CHART.JS (VIBRATION - Ginaya na sa Gas style, 0-5 scale)
+        // 2. SETUP CHART.JS (VIBRATION - 0 to 5 Scale, tulad ng Gas)
         // ==========================================
         const ctxVib = document.getElementById('vibrationChart').getContext('2d');
         const vibrationChart = new Chart(ctxVib, {
@@ -187,7 +187,7 @@
                     backgroundColor: 'rgba(239, 68, 68, 0.1)',
                     borderWidth: 3,
                     fill: true,
-                    tension: 0.4, // Smooth curve, katulad ng Gas graph
+                    tension: 0.4, // Smooth curve, kapareho ng Gas graph
                     pointRadius: 4,
                     pointBackgroundColor: '#0f172a',
                     pointBorderColor: '#ef4444',
@@ -200,8 +200,8 @@
                 plugins: { legend: { labels: { color: '#94a3b8' } } },
                 scales: {
                     y: { 
-                        min: 0,   // Simula sa 0
-                        max: 5,   // <--- BINAGO NATIN ITO (0 to 5 base sa request mo)
+                        min: 0,   
+                        max: 5,   // <--- 0 to 5 SCALE PARA MAY MALAKING SPACE SA TAAS
                         ticks: { stepSize: 1, color: '#94a3b8' }, 
                         grid: { color: 'rgba(255, 255, 255, 0.05)' } 
                     },
@@ -224,16 +224,13 @@
                 
                 const data = await response.json();
 
-                // Update Connection Status Indicator
                 const statusDot = document.getElementById('status-dot');
                 const statusText = document.getElementById('status-text');
                 statusDot.className = 'status-dot dot-live';
                 statusText.innerText = 'Connected to Supabase - IoT Real-time Dashboard';
 
-                // Update Numbers (Gas)
                 document.getElementById('gas-value').innerText = data.gas_value;
                 
-                // Update Vibration Status
                 const vibText = data.vibration === 1 ? '⚠️ DETECTED' : '✅ SAFE';
                 const vibElement = document.getElementById('vibration-value');
                 vibElement.innerText = vibText;
@@ -246,7 +243,6 @@
                     vibElement.style.textShadow = '0 0 15px rgba(25, 135, 84, 0.5)';
                 }
 
-                // Check Alert Logic
                 const alertElement = document.getElementById('alert-value');
                 if (data.alert) {
                     alertElement.innerText = '🚨 ALERT!';
@@ -270,7 +266,6 @@
 
             } catch (error) {
                 console.error("Error fetching data:", error);
-                
                 const statusDot = document.getElementById('status-dot');
                 const statusText = document.getElementById('status-text');
                 statusDot.className = 'status-dot dot-error';
@@ -278,9 +273,8 @@
             }
         }
 
-        // 4. RUN EVERY 3 SECONDS
         setInterval(updateDashboard, 3000);
-        updateDashboard(); // Initial run
+        updateDashboard(); 
     </script>
 </body>
 </html>
