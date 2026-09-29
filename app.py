@@ -19,8 +19,8 @@ def index():
 @app.route('/api/data')
 def get_sensor_data():
     try:
-        # Kukuha tayo ng huling 20 readings mula sa Supabase
-        response = supabase.table('sensor_readings').select('*').order('created_at', desc=False).limit(20).execute()
+        # Kukuha tayo ng huling 50 readings mula sa Supabase para may mai-scroll
+        response = supabase.table('sensor_readings').select('*').order('created_at', desc=False).limit(50).execute()
         data = response.data
 
         # Kung walang data sa database, magbalik ng zero values
@@ -29,14 +29,14 @@ def get_sensor_data():
                 'gas_value': 0, 
                 'vibration': 0, 
                 'alert': False, 
-                'gas_history': [0]*20, 
-                'vibration_history': [0]*20, # <--- ITO YUNG KULANG KANINA
-                'time_history': ['--:--']*20
+                'gas_history': [0]*50, 
+                'vibration_history': [0]*50,
+                'time_history': ['--:--']*50
             })
 
         # I-extract ang data para sa graph
         gas_history = [row['gas_value'] for row in data]
-        vibration_history = [row['vibration_value'] for row in data] # <--- IDINAGDAG NATIN ITO
+        vibration_history = [row['vibration_value'] for row in data]
         
         # Kunin lang yung oras (HH:MM:SS) mula sa timestamp
         time_history = []
@@ -59,7 +59,7 @@ def get_sensor_data():
             'vibration': vibration,
             'alert': alert,
             'gas_history': gas_history,
-            'vibration_history': vibration_history, # <--- IDINAGDAG NATIN ITO
+            'vibration_history': vibration_history,
             'time_history': time_history
         })
 
