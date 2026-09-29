@@ -173,7 +173,7 @@
         });
 
         // ==========================================
-        // 2. SETUP CHART.JS (VIBRATION - 0 to 5 Scale, tulad ng Gas)
+        // 2. SETUP CHART.JS (VIBRATION - 0 to 50 Scale)
         // ==========================================
         const ctxVib = document.getElementById('vibrationChart').getContext('2d');
         const vibrationChart = new Chart(ctxVib, {
@@ -187,7 +187,7 @@
                     backgroundColor: 'rgba(239, 68, 68, 0.1)',
                     borderWidth: 3,
                     fill: true,
-                    tension: 0.4, // Smooth curve, kapareho ng Gas graph
+                    tension: 0.4, 
                     pointRadius: 4,
                     pointBackgroundColor: '#0f172a',
                     pointBorderColor: '#ef4444',
@@ -201,8 +201,8 @@
                 scales: {
                     y: { 
                         min: 0,   
-                        max: 5,   // <--- 0 to 5 SCALE PARA MAY MALAKING SPACE SA TAAS
-                        ticks: { stepSize: 1, color: '#94a3b8' }, 
+                        max: 50,   // <--- BINAGO NATIN ITO (0 to 50)
+                        ticks: { stepSize: 10, color: '#94a3b8' }, // <--- Steps ng 10 (0, 10, 20, 30, 40, 50)
                         grid: { color: 'rgba(255, 255, 255, 0.05)' } 
                     },
                     x: { grid: { display: false }, ticks: { color: '#94a3b8' } }
