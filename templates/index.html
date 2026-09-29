@@ -57,11 +57,19 @@
             /* Custom scrollbar styling para bagay sa dark mode */
             scrollbar-width: thin;
             scrollbar-color: #38bdf8 #1e293b;
+            position: relative;
         }
         
-        .graph-scroll-wrapper canvas {
+        /* Ito yung magfforce ng lapad ng graph */
+        .graph-inner-wrapper {
+            width: 2500px; /* 2500px ang lapad, kaya magkakaroon ng scrollbar */
+            height: 100%;
+            position: relative;
+        }
+
+        .graph-inner-wrapper canvas {
             height: 100% !important;
-            min-width: 1200px; /* Pinipilit niyang lumawak para mag-scroll */
+            width: 100% !important;
         }
         
         /* Para sa Chrome/Safari scrollbar */
@@ -148,9 +156,11 @@
                 <div class="card shadow-sm">
                     <div class="graph-card-body">
                         <h5 class="card-title text-secondary mb-3 text-start">📈 Gas Readings (MQ-2)</h5>
-                        <!-- SCROLL WRAPPER DITO -->
+                        <!-- SCROLL WRAPPER -->
                         <div class="graph-scroll-wrapper">
-                            <canvas id="gasChart"></canvas>
+                            <div class="graph-inner-wrapper">
+                                <canvas id="gasChart"></canvas>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -160,9 +170,11 @@
                 <div class="card shadow-sm">
                     <div class="graph-card-body">
                         <h5 class="card-title text-secondary mb-3 text-start">📉 Vibration Readings (SW-420)</h5>
-                        <!-- SCROLL WRAPPER DITO -->
+                        <!-- SCROLL WRAPPER -->
                         <div class="graph-scroll-wrapper">
-                            <canvas id="vibrationChart"></canvas>
+                            <div class="graph-inner-wrapper">
+                                <canvas id="vibrationChart"></canvas>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -195,7 +207,7 @@
             },
             options: {
                 responsive: true,
-                maintainAspectRatio: false, // Importante ito para sa scroll
+                maintainAspectRatio: false, 
                 plugins: { legend: { labels: { color: '#94a3b8' } } },
                 scales: {
                     y: { beginAtZero: true, max: 1023, grid: { color: 'rgba(255, 255, 255, 0.05)' }, ticks: { color: '#94a3b8' } },
@@ -229,12 +241,12 @@
             },
             options: {
                 responsive: true,
-                maintainAspectRatio: false, // Importante ito para sa scroll
+                maintainAspectRatio: false, 
                 plugins: { legend: { labels: { color: '#94a3b8' } } },
                 scales: {
                     y: { 
                         min: 0,   
-                        max: 50,   // 0 to 50 scale base sa request mo
+                        max: 50,   
                         ticks: { stepSize: 10, color: '#94a3b8' }, 
                         grid: { color: 'rgba(255, 255, 255, 0.05)' } 
                     },
